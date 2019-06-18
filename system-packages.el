@@ -1,15 +1,14 @@
 ;;; system-packages.el --- functions to manage system packages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016-2018  Free Software Foundation, Inc.
+;; Copyright (C) 2016-2019 Free Software Foundation, Inc.
 
 ;; Author: J. Alexander Branham <alex.branham@gmail.com>
 ;; Maintainer: J. Alexander Branham <alex.branham@gmail.com>
 ;; URL: https://gitlab.com/jabranham/system-packages
 ;; Package-Requires: ((emacs "24.3"))
-;; Version: 1.0.10
+;; Version: 1.0.11
 
-
-;; This file is not part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;;; License:
 ;;
@@ -161,7 +160,7 @@
           (remove-orphaned . "apt-get autoremove")
           (list-installed-packages . "dpkg -l")
           (list-installed-packages-all . "dpkg -l")
-          (list-dependencies-of . "apt-cache deps")
+          (list-dependencies-of . "apt-cache depends")
           (noconfirm . "-y")))
     (aptitude .
               ((default-sudo . t)
