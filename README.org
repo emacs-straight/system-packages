@@ -6,7 +6,7 @@
 [[https://gitlab.com/jabranham/system-packages/badges/master/pipeline.svg]]
 
 This is a collection of functions to make handling installed system
-packages more convenient through emacs. 
+packages more convenient through Emacs.
 
 * Installation
 
@@ -71,9 +71,12 @@ the commands to =system-packages-supported-package-managers= like so:
                          (update . "pacaur -Syu")
                          (clean-cache . "pacaur -Sc")
                          (log . "cat /var/log/pacman.log")
+                         (change-log . "pacaur -Qc")
                          (get-info . "pacaur -Qi")
                          (get-info-remote . "pacaur -Si")
                          (list-files-provided-by . "pacaur -Ql")
+                         (owning-file . "pacaur -Qo")
+                         (owning-file-remote . "pacaur -F")
                          (verify-all-packages . "pacaur -Qkk")
                          (verify-all-dependencies . "pacaur -Dk")
                          (remove-orphaned . "pacaur -Rns $(pacman -Qtdq)")
@@ -83,7 +86,11 @@ the commands to =system-packages-supported-package-managers= like so:
                          (noconfirm . "--noconfirm"))))
 #+END_SRC
 
-You may then need to adjust =system-packages-package-manager= and
+Any occurrences of ~%p~ in a command will be replaced with the package
+name during execution, otherwise the package name is simply appended
+to the command.
+
+You may also need to adjust =system-packages-package-manager= and
 =system-packages-use-sudo= accordingly:
 
 #+BEGIN_SRC emacs-lisp

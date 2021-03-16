@@ -1,6 +1,6 @@
 ;;; system-packages.el --- functions to manage system packages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016-2019 Free Software Foundation, Inc.
+;; Copyright (C) 2016-2021 Free Software Foundation, Inc.
 
 ;; Author: J. Alexander Branham <alex.branham@gmail.com>
 ;; Maintainer: J. Alexander Branham <alex.branham@gmail.com>
@@ -55,7 +55,7 @@
            (install . "guix package -i")
            (search . "guix package -s")
            (uninstall . "guix package -r")
-           (update . ("guix package --upgrade"))
+           (update . "guix package --upgrade")
            (clean-cache . "guix gc")
            (log . nil)
            (get-info . nil)
@@ -74,7 +74,7 @@
           (install . "nix-env -i")
           (search . "nix search")
           (uninstall . "nix-env -e")
-          (update . ("nix-env -u" ))
+          (update . "nix-env -u")
           (clean-cache . "nix-collect-garbage")
           (log . nil)
           (get-info . nil)
@@ -93,7 +93,7 @@
            (install . "brew install")
            (search . "brew search")
            (uninstall . "brew uninstall")
-           (update . ("brew update" "brew upgrade"))
+           (update . "brew update && brew upgrade")
            (clean-cache . "brew cleanup")
            (log . nil)
            (get-info . nil)
@@ -111,7 +111,7 @@
            (install . "port install")
            (search . "port search")
            (uninstall . "port uninstall")
-           (update . ("port sync" "port upgrade outdated"))
+           (update . "port sync && port upgrade outdated")
            (clean-cache . "port clean --all")
            (log . "port log")
            (get-info . "port info")
@@ -132,10 +132,13 @@
              (uninstall . "pacman -Rns")
              (update . "pacman -Syu")
              (clean-cache . "pacman -Sc")
+             (change-log . "pacman -Qc")
              (log . "cat /var/log/pacman.log")
              (get-info . "pacman -Qi")
              (get-info-remote . "pacman -Si")
-             (list-files-provided-by . "pacman -Ql")
+             (list-files-provided-by . "pacman -qQl")
+             (owning-file . "pacman -Qo")
+             (owning-file-remote . "pacman -F")
              (verify-all-packages . "pacman -Qkk")
              (verify-all-dependencies . "pacman -Dk")
              (remove-orphaned . "pacman -Rns $(pacman -Qtdq)")
@@ -149,12 +152,15 @@
           (install . "apt-get install")
           (search . "apt-cache search")
           (uninstall . "apt-get --purge remove")
-          (update . ("apt-get update" "apt-get upgrade"))
+          (update . "apt-get update && apt-get upgrade")
           (clean-cache . "apt-get clean")
           (log . "cat /var/log/dpkg.log")
+          (change-log . "apt-get changelog")
           (get-info . "dpkg -s")
           (get-info-remote . "apt-cache show")
           (list-files-provided-by . "dpkg -L")
+          (owning-file . "dpkg -S")
+          (owning-file-remote . "apt-file search")
           (verify-all-packages . "debsums")
           (verify-all-dependencies . "apt-get check")
           (remove-orphaned . "apt-get autoremove")
@@ -167,12 +173,15 @@
                (install . "aptitude install")
                (search . "aptitude search")
                (uninstall . "aptitude remove")
-               (update . ("apt update" "aptitude safe-upgrade"))
+               (update . "apt update && aptitude safe-upgrade")
                (clean-cache . "aptitude clean")
                (log . "cat /var/log/dpkg.log")
+               (change-log . "aptitude changelog")
                (get-info . "aptitude show")
                (get-info-remote . "aptitude show")
                (list-files-provided-by . "dpkg -L")
+               (owning-file . "dpkg -S")
+               (owning-file-remote . "apt-file search")
                (verify-all-packages . "debsums")
                (verify-all-dependencies . "apt-get check")
                (remove-orphaned . nil) ; aptitude does this automatically
@@ -189,9 +198,12 @@
              (update . "emerge -u world")
              (clean-cache . "eclean distfiles")
              (log . "cat /var/log/portage")
+             (change-log . "equery changes -f")
              (get-info . "emerge -pv")
              (get-info-remote . "emerge -S")
              (list-files-provided-by . "equery files")
+             (owning-file . "equery belongs")
+             (owning-file-remote . "equery belongs")
              (verify-all-packages . "equery check")
              (verify-all-dependencies . "emerge -uDN world")
              (remove-orphaned . "emerge --depclean")
@@ -211,6 +223,8 @@
              (get-info . "zypper info")
              (get-info-remote . "zypper info")
              (list-files-provided-by . "rpm -Ql")
+             (owning-file . "zypper search -f")
+             (owning-file-remote . "zypper search -f")
              (verify-all-packages . "rpm -Va")
              (verify-all-dependencies . "zypper verify")
              (remove-orphaned . "zypper rm -u")
@@ -224,12 +238,15 @@
           (install . "dnf install")
           (search . "dnf search")
           (uninstall . "dnf remove")
-          (update . ("dnf upgrade"))
+          (update . "dnf upgrade")
           (clean-cache . "dnf clean all")
+          (change-log . "rpm -q --changelog")
           (log . "dnf history")
           (get-info . "rpm -qi")
           (get-info-remote . "dnf info")
           (list-files-provided-by . "rpm -ql")
+          (owning-file . "rpm -qf")
+          (owning-file-remote . "dnf provides")
           (verify-all-packages . "rpm -Va")
           (verify-all-dependencies . "dnf repoquery --requires")
           (remove-orphaned . "dnf autoremove")
@@ -246,9 +263,12 @@
 	  (update . "yum update")
 	  (clean-cache . "yum clean expire-cache")
 	  (log . "cat /var/log/yum.log")
+          (change-log . "rpm -q --changelog")
 	  (get-info . "yum info")
 	  (get-info-remote . "repoquery --plugins -i")
 	  (list-files-provided-by . "rpm -ql")
+          (owning-file . "rpm -qf")
+          (owning-file-remote . "repoquery -f")
 	  (verify-all-packages)
 	  (verify-all-dependencies)
 	  (remove-orphaned . "yum autoremove")
@@ -264,7 +284,7 @@
                    (install . "xbps-install")
                    (search . "xbps-query -Rs")
                    (uninstall . "xbps-remove -R")
-                   (update . ("xbps-install -Su"))
+                   (update . "xbps-install -Su")
                    (clean-cache . "xbps-remove -O")
                    (log . nil)
                    (get-info . "xbps-query")
@@ -278,7 +298,10 @@
                    (list-dependencies-of . "xbps-query -x")
                    (noconfirm . nil))))
   "An alist of package manager commands.
-The key is the package manager and values (usually) commands.")
+The key is the package manager and value (usually) the shell command to run.
+Any occurrences of ~%p~ in the command will be replaced with the package
+name during execution, otherwise the package name is simply appended
+to the command.")
 (put 'system-packages-supported-package-managers 'risky-local-variable t)
 
 (define-obsolete-variable-alias 'system-packages-packagemanager
@@ -293,8 +316,8 @@ The key is the package manager and values (usually) commands.")
             (setq managers nil)
           (setq manager nil))))
     (car manager))
-  "Symbol containing the package manager to use.
-See `system-packages-supported-package-managers' for a list of
+  "Symbol naming the package manager to use.
+See `system-packages-supported-package-managers' for the list of
 supported software.  Tries to be smart about selecting the
 default.  If you change this value, you may also want to change
 `system-packages-use-sudo'."
@@ -340,10 +363,10 @@ of passing additional arguments to the package manager."
                                              system-packages-supported-package-managers)))))))
     (unless command
       (error (format "%S not supported in %S" action system-packages-package-manager)))
-    (unless (listp command)
-      (setq command (list command)))
-    (setq command (mapconcat #'identity command " && "))
-    (setq command (mapconcat #'identity (list command pack) " "))
+    (setq command
+          (if (string-match-p "%p" command)
+              (replace-regexp-in-string "%p" pack command t t)
+            (concat command " " pack)))
     (when noconfirm
       (setq args (concat args (and pack " ") noconfirm)))
     (concat command args)))
@@ -407,7 +430,7 @@ package manager."
 Uses the package manager named in
 `system-packages-package-manager' to uninstall PACK.  You may use
 ARGS to pass options to the package manager."
-  (interactive "sWhat package to uninstall: ")
+  (interactive "sPackage to uninstall: ")
   (system-packages--run-command 'uninstall pack args))
 
 ;;;###autoload
@@ -415,7 +438,7 @@ ARGS to pass options to the package manager."
   "List the dependencies of PACK.
 
 You may use ARGS to pass options to the package manager."
-  (interactive "sWhat package to list dependencies of: ")
+  (interactive "sPackage to list dependencies of: ")
   (system-packages--run-command 'list-dependencies-of pack args))
 
 ;;;###autoload
@@ -424,7 +447,7 @@ You may use ARGS to pass options to the package manager."
 
 With a prefix argument, display remote package information.  You
 may use ARGS to pass options to the package manager."
-  (interactive "sWhat package to list info for: ")
+  (interactive "sPackage to list info for: ")
   (if current-prefix-arg
       (system-packages--run-command 'get-info-remote pack args)
     (system-packages--run-command 'get-info pack args)))
@@ -434,8 +457,29 @@ may use ARGS to pass options to the package manager."
   "List the files provided by PACK.
 
 You may use ARGS to pass options to the package manager."
-  (interactive "sWhat package to list provided files of: ")
+  (interactive "sPackage to list provided files of: ")
   (system-packages--run-command 'list-files-provided-by pack args))
+
+;;;###autoload
+(defun system-packages-owning-file (file &optional args)
+  "Search for packages containing FILE.
+
+Search only locally installed packages by default.  With a prefix
+argument, try to search packages not yet installed.
+
+You may use ARGS to pass options to the package manager."
+  (interactive "FFile name: ")
+  (if current-prefix-arg
+      (system-packages--run-command 'owning-file-remote file args)
+    (system-packages--run-command 'owning-file file args)))
+
+;;;###autoload
+(defun system-packages-change-log (pack &optional args)
+  "Show the change log of PACK.
+
+You may use ARGS to pass options to the package manager."
+  (interactive "sPackage to show change log of: ")
+  (system-packages--run-command 'change-log pack args))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functions that don't take a named package
