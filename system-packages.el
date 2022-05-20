@@ -48,7 +48,7 @@
   :group 'packages)
 
 (defvar system-packages-supported-package-managers
-  '(
+  `(
     ;; guix
     (guix .
           ((default-sudo . nil)
@@ -193,8 +193,10 @@
     (emerge .
             ((default-sudo . t)
              (install . "emerge")
-             (search . "emerge -S")
-             (uninstall . "emerge -C")
+             (search . ,(if (executable-find "eix")
+                            "eix"
+                          "emerge -S"))
+             (uninstall . "emerge --depclean")
              (update . "emerge -u world")
              (clean-cache . "eclean distfiles")
              (log . "cat /var/log/portage")
