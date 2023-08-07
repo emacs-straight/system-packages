@@ -1,12 +1,12 @@
 ;;; system-packages.el --- functions to manage system packages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016-2021 Free Software Foundation, Inc.
+;; Copyright (C) 2016-2023 Free Software Foundation, Inc.
 
 ;; Author: J. Alexander Branham <alex.branham@gmail.com>
 ;; Maintainer: J. Alexander Branham <alex.branham@gmail.com>
 ;; URL: https://gitlab.com/jabranham/system-packages
 ;; Package-Requires: ((emacs "24.3"))
-;; Version: 1.0.11
+;; Version: 1.0.12
 
 ;; This file is part of GNU Emacs.
 
@@ -23,8 +23,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see
-;; <http://www.gnu.org/licenses/>
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -314,9 +313,13 @@ to the command.")
     (while managers
       (progn
         (setq manager (pop managers))
-        (if (executable-find (symbol-name (car manager)))
-            (setq managers nil)
-          (setq manager nil))))
+        (let ((found (executable-find (symbol-name (car manager)))))
+          (if (and found
+                   ;; The package manager named "pacman" conflicts
+                   ;; with the game binary on non-Arch systems.
+                   (not (string-match (rx "games/pacman" eos) found)))
+              (setq managers nil)
+            (setq manager nil)))))
     (car manager))
   "Symbol naming the package manager to use.
 See `system-packages-supported-package-managers' for the list of
@@ -353,7 +356,7 @@ Tries to be smart for selecting the default."
 (defun system-packages-get-command (action &optional pack args)
   "Return a command to run as a string.
 ACTION should be in
-`system-packages-supported-package-managers' (e.g. 'install).
+`system-packages-supported-package-managers' (e.g. \='install).
 PACK is used to operate on a specific package, and ARGS is a way
 of passing additional arguments to the package manager."
   (let ((command
