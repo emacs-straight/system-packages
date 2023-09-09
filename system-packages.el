@@ -6,7 +6,7 @@
 ;; Maintainer: J. Alexander Branham <alex.branham@gmail.com>
 ;; URL: https://gitlab.com/jabranham/system-packages
 ;; Package-Requires: ((emacs "24.3"))
-;; Version: 1.0.12
+;; Version: 1.0.13
 
 ;; This file is part of GNU Emacs.
 
@@ -123,28 +123,6 @@
            (list-installed-packages-all . "port installed")
            (list-dependencies-of . "port deps")
            (noconfirm . nil)))
-    ;; Arch-based systems
-    (pacman .
-            ((default-sudo . t)
-             (install . "pacman -S")
-             (search . "pacman -Ss")
-             (uninstall . "pacman -Rns")
-             (update . "pacman -Syu")
-             (clean-cache . "pacman -Sc")
-             (change-log . "pacman -Qc")
-             (log . "cat /var/log/pacman.log")
-             (get-info . "pacman -Qi")
-             (get-info-remote . "pacman -Si")
-             (list-files-provided-by . "pacman -qQl")
-             (owning-file . "pacman -Qo")
-             (owning-file-remote . "pacman -F")
-             (verify-all-packages . "pacman -Qkk")
-             (verify-all-dependencies . "pacman -Dk")
-             (remove-orphaned . "pacman -Rns $(pacman -Qtdq)")
-             (list-installed-packages . "pacman -Qe")
-             (list-installed-packages-all . "pacman -Q")
-             (list-dependencies-of . "pacman -Qi")
-             (noconfirm . "--noconfirm")))
     ;; Debian (and Ubuntu) based systems
     (apt .
          ((default-sudo . t)
@@ -297,7 +275,29 @@
                    (list-installed-packages . "xbps-query -l ")
                    (list-installed-packages-all . "xbps-query -l ")
                    (list-dependencies-of . "xbps-query -x")
-                   (noconfirm . nil))))
+                   (noconfirm . nil)))
+    ;; Arch-based systems
+    (pacman .
+            ((default-sudo . t)
+             (install . "pacman -S")
+             (search . "pacman -Ss")
+             (uninstall . "pacman -Rns")
+             (update . "pacman -Syu")
+             (clean-cache . "pacman -Sc")
+             (change-log . "pacman -Qc")
+             (log . "cat /var/log/pacman.log")
+             (get-info . "pacman -Qi")
+             (get-info-remote . "pacman -Si")
+             (list-files-provided-by . "pacman -qQl")
+             (owning-file . "pacman -Qo")
+             (owning-file-remote . "pacman -F")
+             (verify-all-packages . "pacman -Qkk")
+             (verify-all-dependencies . "pacman -Dk")
+             (remove-orphaned . "pacman -Rns $(pacman -Qtdq)")
+             (list-installed-packages . "pacman -Qe")
+             (list-installed-packages-all . "pacman -Q")
+             (list-dependencies-of . "pacman -Qi")
+             (noconfirm . "--noconfirm"))))
   "An alist of package manager commands.
 The key is the package manager and value (usually) the shell command to run.
 Any occurrences of ~%p~ in the command will be replaced with the package
